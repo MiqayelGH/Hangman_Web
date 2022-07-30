@@ -75,7 +75,7 @@ function startPoint(score,bool) {
         <div id="game"></div>  
         <div id="wrong-letter"></div>
     <div id="game_start">
-        <input type="submit" id="start_button" value="Continue">
+      <input type="submit" id="start_button" value="Continue">
     </div>`
     startNewGame()
     }  
@@ -148,7 +148,7 @@ function startGame(wordObj) {
       return startPoint(score,true)
     }
 
-    if(!flag){
+    if(!flag && input.value!==''){
       const wrong = document.getElementById('wrong-letter')
       wrongWord(wrong,input.value)
       chances --;
