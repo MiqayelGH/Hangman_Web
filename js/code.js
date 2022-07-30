@@ -1,26 +1,3 @@
-//Start moment
-const options = {
-	method: 'GET',
-	headers: {
-		'X-RapidAPI-Key': '32ba330acfmsh07360fad9d46082p14f649jsn18d89deaeab6',
-		'X-RapidAPI-Host': 'random-words5.p.rapidapi.com'
-	}
-};
-
-
-
-// fetch('https://random-words5.p.rapidapi.com/getMultipleRandom?count=5', options1)
-// 	.then(response => response.json())
-// 	.then(response => {
-//     const entered_word = response[Math.round(Math.random() * 5)]
-//         fetch(`https://wordsapiv1.p.rapidapi.com/words/${entered_word}/typeOf`, options2)
-//           .then(response => response.json())
-//           .then(response => console.log(response,'Resp')) // return {word,typeOf}
-//           .catch(err => console.error(err));
-
-//   })
-// 	.catch(err => console.error(err));
-
 const start_page = document.getElementById('start') 
 start_page.innerHTML += `<div id = "game_start">
                                 <input type="submit" id="start_button" value="New game">
@@ -32,20 +9,24 @@ let chances = 7;
 let score = 0; 
 let inputedTrue = {};
 let wordValues = {};
-let wordInp = ''
+let wordObj = ''
 startNewGame();
+let testWord = '';
 
 function startNewGame(){  
- 
   const startButton = document.getElementById("start_button");
-    fetch(`https://random-word-api.herokuapp.com/word`)
+  fetch(`https://random-words-api.vercel.app/word/verb`)
+  .then(response => response.json())
+  .then(response => {
+      testWord = response[0].word
+      fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${testWord}`)
       .then(response => response.json())
       .then(response => {
       try {
-        wordInp = response[0]
+        wordObj = response[0]
       }
       catch(err){}
-    })     
+    })})    
     startButton.addEventListener("click",function() {
       start_page.innerHTML = `
       <div id="game"></div>  
@@ -55,11 +36,11 @@ function startNewGame(){
       game.innerHTML = `
       <div id="question"></div>
       <div id="hint"></div>`
-      startGame({word:wordInp,typeOf:['something']})
+      startGame(wordObj)
       document.getElementById('enteredWord').onclick = openWord;
 })
 }
-//Equal function
+
 function isEqual(object1, object2) {
   const props1 = Object.getOwnPropertyNames(object1);
   const props2 = Object.getOwnPropertyNames(object2);
@@ -78,7 +59,7 @@ function isEqual(object1, object2) {
 
   return true;
 }
-//Function for NewGame and EndGame
+//when game ended or started again
 function startPoint(score,bool) { 
 wordValues = {};
 
@@ -90,7 +71,6 @@ wordValues = {};
      <div id = "game_start">
         <input type="submit" id="start_button" value="New game">
      </div>`
-     console.log(start_page)
    score = 0; 
    startNewGame()
   }
@@ -107,19 +87,20 @@ wordValues = {};
   
 }
                    
-//Getting word and create boxes,input and submit button
+//Getting word and create letter boxes,input and submit button
 function startGame(wordObj) {
   let word = wordObj.word
   console.log(word)
-  wordObj.typeOf.length ? document.getElementById("hint").innerText = `  
-  Hint:It's about "${wordObj.typeOf[0]}"` : document.getElementById("hint").innerText = ``
+  let description = wordObj.meanings[0].definitions[0].definition;
+  console.log(description)
+ description.length ? document.getElementById("hint").innerText = `  
+  Hint:It's about "${description}"` : document.getElementById("hint").innerText = ``
 
       for (let i = 0; i < word.length; i++) {
           if (!wordValues[word[i].toLowerCase()]) {
             wordValues[word[i].toLowerCase()] = 1;
           }
       }
-
   word =  word.split('')
   const question = document.getElementById('question');
   const parent_element = document.createElement("div");
@@ -150,30 +131,24 @@ function startGame(wordObj) {
 
 function openWord() {
  let flag = false;
-//  console.log(openword.word)
  let entered_char = input.value.toLowerCase();
-let word = wordInp;  
+let word = wordObj.word
   for (let i = 0; i < word.length; i++) {
         if (entered_char == word[i]) {  
                 if (!inputedTrue[input.value]) {
                 score += 10;
                 inputedTrue[input.value] = 1;
-                // }else if(inputedTrue[input.value] = 1){
-                //   flag = true ;
-                //   continue;
-                // }
                 }
           let child = document.getElementsByClassName(`box${i}`)[0]
-          try{
+        try{
           child.className = "correct-answer"
           child.innerHTML =`<span>${word[i]}</span>` 
-          }catch(err){}
-          flag = true;
+        }catch(err){};
+        flag = true;
         }
   }
 
   if (isEqual(inputedTrue,wordValues)) {
-    console.log('ended')
     inputedTrue = {};
     score += 100;
     return startPoint(score,true)
