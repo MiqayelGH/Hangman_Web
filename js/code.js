@@ -11,26 +11,25 @@ startNewGame();
 
 function startNewGame(){  
     const startButton = document.getElementById("start_button");
+    
     fetch(`https://random-words-api.vercel.app/word/verb`)
     .then(response => response.json())
     .then(response => {
-          fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${response[0].word}`)
-          .then(response => response.json())
-          .then(response => {
-        try {
-          wordObj = response[0]
-        }
-        catch(err){}
-      })})    
-      startButton.addEventListener("click",function() {
+           fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${response[0].word}`)
+           .then(response => response.json())
+           .then(response => {
+           wordObj = response[0]
+      })}) 
+
+      startButton.addEventListener("click",function() {        
         startPage.innerHTML = `
-        <div id="game"></div>  
-        <div id="wrong-letter"></div>`
+            <div id="game"></div>  
+            <div id="wrong-letter"></div>`
         startButton.remove();
-        const game = document.getElementById("game");3
+        const game = document.getElementById("game");
         game.innerHTML = `
-        <div id="question"></div>
-        <div id="hint"></div>`
+            <div id="question"></div>
+            <div id="hint"></div>`
         startGame(wordObj)
         document.getElementById('enteredWord').onclick = openWord;
   })
@@ -90,6 +89,7 @@ function startGame(wordObj) {
     Hint:It's about "${description}"` : document.getElementById("hint").innerText = ``
 
         for (let i = 0; i < word.length; i++) {
+
             if (!wordValues[word[i].toLowerCase()]) {
               wordValues[word[i].toLowerCase()] = 1;
             }
@@ -127,12 +127,14 @@ function startGame(wordObj) {
       let flag = false;
       let entered_char = input.value.toLowerCase();
       let word = wordObj.word
+
       for (let i = 0; i < word.length; i++) {
             if (entered_char == word[i]) {  
                     if (!inputedTrue[input.value]) {
                     score += 10;
                     inputedTrue[input.value] = 1;
                     }
+
               let child = document.getElementsByClassName(`box${i}`)[0]
             try {
               child.className = "correct-answer"
